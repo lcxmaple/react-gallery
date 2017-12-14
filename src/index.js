@@ -2,7 +2,7 @@
  * 基于慕课网materliu的React实战--打造画廊应用课程编写
  * 将原来的环境替换为React团队官方的create-react-app脚手架搭建
  * 使用的React版本为16.0.0，以及ES6语法编写，所写代码均按照React16.0.0版本以后的规范编写
-*/
+ */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './style/index.css';
@@ -12,8 +12,8 @@ let imagesDate = require('./imagesDate.json');
 imagesDate = (function genImageUrl(imagesDateArr) {
     for (let i = 0,j=imagesDateArr.length; i < j ;  i++) {
         const singleImageDate = imagesDateArr[i];
-        singleImageDate.imageUrl =require('./imgaes/'+singleImageDate.fileName);
-        imagesDateArr[i]=singleImageDate; 
+        singleImageDate.imageUrl = require('./imgaes/'+singleImageDate.fileName);
+        imagesDateArr[i] = singleImageDate; 
     }
     return imagesDateArr;    
 })(imagesDate);
@@ -21,6 +21,11 @@ imagesDate = (function genImageUrl(imagesDateArr) {
 //取两个数区间内的随机值
 function getRangeRandom(low,high) {
     return Math.ceil(Math.random() * (high-low) + low);    
+}
+
+//随机旋转30度
+function get30DegRandom() {
+    return ((Math.random() > 0.5?'' : '-')+Math.ceil(Math.random() * 30));
 }
 
 class ImgFigure extends React.Component{
@@ -31,6 +36,12 @@ class ImgFigure extends React.Component{
         //如果props属性中指定了这张图的位置，则使用
         if(this.props.arrange.pos){
             styleObj = this.props.arrange.pos;
+        }
+
+        if(this.props.arrange.rotate){
+            (['-moz-','-ms-','-webkit-','']).forEach(value =>{
+                styleObj[value +  'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+            });
         }
 
         return (
@@ -72,7 +83,8 @@ class ReactGallery extends React.Component{
                 //     pos : {
                 //         left : '0',
                 //         top : '0'
-                //     }
+                //     },
+                //     rotate : 0,
                 // }
             ]
         };
@@ -101,6 +113,9 @@ class ReactGallery extends React.Component{
 
         //首先居中 centerIndex 图片
         imgsArrangeCenterArr[0].pos = centerPos;
+
+        //中心 centerIndex 的图片不需要旋转
+        imgsArrangeCenterArr[0].rotate = 0;
         
         //取出要布局上侧图片的状态信息
         topImgSpliceIndex = Math.ceil(Math.random() * (imgsArrangeArr.length - topImgNum));
@@ -108,10 +123,14 @@ class ReactGallery extends React.Component{
 
         //布局位于上侧的图片
         imgsArrangeTopArr.forEach((value,index) => 
-            imgsArrangeTopArr[index].pos = {
-                top: getRangeRandom(vPosRangeTopY[0],vPosRangeTopY[1]),
-                left: getRangeRandom(vPosRangeX[0],vPosRangeX[1])
-            }
+            imgsArrangeTopArr[index] = {
+                pos : {
+                    top: getRangeRandom(vPosRangeTopY[0],vPosRangeTopY[1]),
+                    left: getRangeRandom(vPosRangeX[0],vPosRangeX[1])
+                },
+                rotate : get30DegRandom()
+
+            } 
         );
 
         //布局左右两侧的图片
@@ -125,9 +144,12 @@ class ReactGallery extends React.Component{
                 hPosRangeLORX = hPosRangeRightSecX;
             }
             
-            imgsArrangeArr[i].pos = {
-                top : getRangeRandom(hPosRangeY[0],hPosRangeY[1]),
-                left : getRangeRandom(hPosRangeLORX[0],hPosRangeLORX[1])
+            imgsArrangeArr[i]={
+                pos : {
+                    top : getRangeRandom(hPosRangeY[0],hPosRangeY[1]),
+                    left : getRangeRandom(hPosRangeLORX[0],hPosRangeLORX[1])
+                },
+                rotate : get30DegRandom()
             };
         }
 
@@ -190,7 +212,8 @@ class ReactGallery extends React.Component{
                     pos :{
                         left : 0,
                         top : 0
-                    }
+                    },
+                    rotate : 0
                 };
             }
             imgFigures.push(<ImgFigure date={value} key={'imgFigure:'+index} ref={input => this['imgFigure' + index] = input} 
