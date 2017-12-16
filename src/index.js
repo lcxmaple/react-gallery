@@ -1,7 +1,7 @@
 /*
  * 基于慕课网materliu的React实战--打造画廊应用课程编写
  * 将原来的环境替换为React团队官方的create-react-app脚手架搭建
- * 使用的React版本为16.0.0，以及ES6语法编写，所写代码均按照React16.0.0版本以后的规范编写
+ * 使用的React版本为16.0.0，以及ES6语法编写，所写代码尽可能的按照React16.0.0版本以后的规范重新编写
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -109,6 +109,41 @@ class ImgFigure extends React.Component{
     }
 }
 
+class ControllerUnit extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleClick = this
+            .handleClick
+            .bind(this);
+    }
+
+    handleClick(e) {
+        //如果点中的是选中态的图片，则翻转，否则居中
+        if(this.props.arrange.isCenter){
+            this.props.inverse();
+        }else{
+            this.props.center();
+        }
+        e.preventDefault();
+        e.stopPropagation();   
+    }
+
+    render() {
+        let controllerUnitClassName = 'controller-unit';
+        // 如果对应图片居中，则显示居中态
+        if(this.props.arrange.isCenter){
+            controllerUnitClassName += ' is-center';
+            // 如果对应图片翻转，则显示翻转态
+            if(this.props.arrange.isInverse){
+                controllerUnitClassName += ' is-inverse';
+            }
+        }
+        return (
+            <span className={controllerUnitClassName} onClick={this.handleClick}></span>
+        );
+    }
+}
+
 
 class ReactGallery extends React.Component{
     constructor(props){
@@ -177,7 +212,7 @@ class ReactGallery extends React.Component{
             vPosRangeX = vPosRange.x,
             
             imgsArrangeTopArr =[],
-            topImgNum = Math.ceil(Math.random() * 2),  //取一个或者不取
+            topImgNum = Math.floor(Math.random() * 2),  //取一个或者不取
             topImgSpliceIndex = 0,
             
             imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex,1);
@@ -225,7 +260,7 @@ class ReactGallery extends React.Component{
                 isCenter : false
             };
         }
-
+        
         if(imgsArrangeTopArr && imgsArrangeTopArr[0]){
             imgsArrangeArr.splice(topImgSpliceIndex, 0,imgsArrangeTopArr[0]);
         }
@@ -284,7 +319,7 @@ class ReactGallery extends React.Component{
     }
 
     render(){
-        let controllerUntils =[],
+        let controllerUnits =[],
             imgFigures =[];
 
         imagesDate.forEach((value,index) => {
@@ -301,12 +336,13 @@ class ReactGallery extends React.Component{
             }
             imgFigures.push(<ImgFigure date={value} key={'imgFigure:'+index} ref={input => this['imgFigure' + index] = input} 
                 arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
+            controllerUnits.push(<ControllerUnit key={'controller:'+index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
         });    
         return (
             <div>
                 <section className="stage" ref={input => this.stage = input}>
                     <section className="img-sec">{imgFigures}</section>
-                    <nav className="controller-nav">{controllerUntils}</nav>
+                    <nav className="controller-nav">{controllerUnits}</nav>
                 </section>
             </div>
         );
