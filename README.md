@@ -4,4 +4,4 @@
 使用的React版本为16.0.0，以及ES6语法编写，所写代码尽可能的按照React16.0.0版本以后的规范重新编写  
  
 # 项目展示
-https://lcxmaple.github.io/react-gallery/ 
+https://lcxmaple.github.io/react-gallery
